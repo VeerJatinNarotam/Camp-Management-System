@@ -1,0 +1,161 @@
+#define _CRT_SECURE_NO_WARNINGS
+#include <stdio.h>
+#include <string.h>
+
+#define MAX_CAMPERS 100
+#define MAX_ACTIVITIES 30
+
+struct CamperInformation {
+    char camper[61];
+    int age;
+    char activity[31];
+};
+
+struct CamperInformation CreateCamper(char camperName[]);
+int CamperSearch(struct CamperInformation campers[], int count, char targetCamper[]);
+int CampActivities(char activities[31]);
+void UpdateCamperActivity(struct CamperInformation* camperPtr);
+
+int main() {
+    struct CamperInformation campers[MAX_CAMPERS];
+    int camperCount = 0;
+    char option;
+    int found;
+    char name[61];
+    int i;
+    do {
+        printf("Please choose an option: \n");
+        printf("1.(C)amper and Activity\n");
+        printf("2.(L)ist All Campers\n");
+        printf("3.(Q)uit\n");
+        scanf(" %c%*[^\n]", &option);
+        if (option == 'C' || option == 'c') {
+            if (camperCount >= MAX_CAMPERS) {
+                printf("The Database is Full.\n");
+            }
+            else {
+                printf("What is the camper's name \n");
+                scanf(" %60[^\n]%*[^\n]", name);
+                found = CamperSearch(campers, camperCount, name);
+                if (found != -1) {
+                    UpdateCamperActivity(&campers[found]);
+                }
+                else {
+                    campers[camperCount] = CreateCamper(name);
+                    camperCount++;
+                    printf("Camper has been added.\n");
+                }
+            }
+        }
+        else
+        {
+            if (option == 'L' || option == 'l') {
+                if (camperCount == 0) {
+                    printf("No campers in the database.\n");
+                }
+                else
+                {
+                    printf("%-13s\t\t %3s\t%-13s\n", "Camper Name", "Age", "Activity");
+                    for (i = 0; i < camperCount; i++) {
+                        printf("%-13s\t\t %3d\t%-13s\n", campers[i].camper, campers[i].age, campers[i].activity);
+                    }
+                }
+            }
+            else
+            {
+                if (option == 'Q' || option == 'q') {
+                    printf("Exiting the program\n");
+                }
+                else
+                {
+                    printf("Invalid option\n");
+                }
+            }
+        }
+    } while (option != 'Q' && option != 'q');
+    return 0;
+}
+
+struct CamperInformation CreateCamper(char camperName[])
+{
+    int age;
+    struct CamperInformation c;
+    strcpy(c.camper, camperName);
+    printf("Please enter your age: \n");
+    while (scanf(" %d%*[^\n]", &age) != 1 || age < 10) {
+        printf("Invalid age. Please enter age again: ");
+        scanf("%*[^\n]%*c");
+    }
+    c.age = age;
+    CampActivities(c.activity);
+    return c;
+}
+
+int CampActivities(char activities[31])
+{
+    int choice;
+    do {
+        printf("Please choose an activity: \n");
+        printf("1. Archery\n");
+        printf("2. Arts & Craft\n");
+        printf("3. Canoeing\n");
+        printf("4. Hiking\n");
+        printf("5. Swimming\n");
+        while (scanf(" %d%*[^\n]", &choice) != 1 && scanf("%*[^\n]") == 0) {
+            printf("Invalid input! Please enter a number 1-5: ");
+        }
+    } while (choice < 1 || choice > 5);
+    if (choice == 1) {
+        strcpy(activities, "Archery");
+    }
+    else if (choice == 2) {
+        strcpy(activities, "Arts & Craft");
+    }
+    else if (choice == 3) {
+        strcpy(activities, "Canoeing");
+    }
+    else if (choice == 4) {
+        strcpy(activities, "Hiking");
+    }
+    else if (choice == 5) {
+        strcpy(activities, "Swimming");
+    }
+    else {
+        printf("Invalid Option");
+    }
+    return 0;
+}
+
+int CamperSearch(struct CamperInformation campers[], int count, char targetCamper[])
+{
+    int i;
+    for (i = 0; i < count; i++) {
+        if (strcmp(campers[i].camper, targetCamper) == 0) {
+            return i;
+        }
+    }
+    return -1;
+}
+
+void UpdateCamperActivity(struct CamperInformation* camperPtr)
+{
+    char answer;
+    printf("Current activity: %s\n", camperPtr->activity);
+    while (1) {
+        printf("Would you like to change the activity? (Y|y / N|n): ");
+        scanf(" %c%*[^\n]", &answer);
+        if (answer == 'Y' || answer == 'y') {
+            CampActivities(camperPtr->activity);
+            printf("Activity has been updated.\n");
+            break;
+        }
+        else if (answer == 'N' || answer == 'n') {
+            printf("Activity has not changed");
+            break;
+        }
+        else
+        {
+            printf("Invalid Character, Please Try Again\n ");
+        }
+    }
+}
